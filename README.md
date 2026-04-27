@@ -18,38 +18,32 @@ AI inferencing is fundamentally a parallel computation problem involving million
 
 ## 2. Hardware & Software Selection
 
-Based on research into real-time embedded applications, we selected the following stack:
+Based on research into real-time embedded applications, we selected the following technical stack to satisfy the solution criteria:
 
 | Component | Selection | Rationale |
 | :--- | :--- | :--- |
-| **Hardware** | **NVIDIA Jetson Orin Nano** | Provides 40 TOPS of AI performance on a low-power, embedded footprint. |
-| **Model** | **YOLOv8 (Single-Pass)** | Industry-standard for balancing speed and accuracy in object detection. |
-| **Framework** | **NVIDIA TensorRT** | Optimizes model layers for the Ampere GPU architecture to maximize FPS. |
-| **Library** | **PyTorch** | Robust library for model integration and preprocessing. |
+| **Hardware** | **NVIDIA Jetson Orin Nano** | Provides 40 TOPS of AI performance on a low-power, embedded footprint suitable for mobile robotics. |
+| **Model** | **YOLOv8 (Single-Pass)** | Industry-standard for balancing speed and accuracy; supports both detection and segmentation. |
+| **Framework** | **NVIDIA TensorRT** | Optimizes model layers specifically for the Ampere GPU architecture to maximize FPS through FP16 precision. |
+| **Library** | **PyTorch** | A robust, flexible library for model integration, preprocessing, and handling live camera streams. |
 
 ---
 
-## 3. System Workflow & Data Pipeline
+## 3. Selection Rationale
 
-The following steps illustrate our complete data flow pipeline:
+Our design choices were driven by the requirement for a **repeatable and high-performance workflow**. 
 
-**Data Flow Pipeline:**
-1. **Input Stage:** Live Video Stream capture via USB Camera.
-2. **Preprocessing:** Image resizing and normalization on the ARM CPU.
-3. **Memory Transfer:** Host-to-Device (H2D) transfer to Jetson GPU Memory.
-4. **Inference:** Parallel computation using the **YOLOv8 TensorRT Engine**.
-5. **Post-processing:** Non-Maximum Suppression (NMS) and Bounding Box annotation.
-6. **Output Stage:** Real-time display of annotated frames with **FPS Metrics**.
+* **Why Jetson Orin Nano?** Unlike standard microcontrollers, the Jetson platform contains a dedicated GPU that allows us to demonstrate true GPU resource utilization in AI workloads.
+* **Why YOLOv8?** It is optimized for real-time applications, allowing our prototype to annotate live camera feeds with bounding boxes and class labels with minimal delay.
+* **Why TensorRT?** Standard models are often too heavy for edge devices. TensorRT allows us to "compress" the model for the hardware, ensuring the system can handle advanced tasks like Instance Segmentation in real-time.
 
 ---
 
-## 4. System Integration & Commands
+## 4. Project Structure
 
-To overcome OS-level dependency conflicts and achieve hardware acceleration, the following integration steps were performed:
+* **[Workflow](./Workflow):** Detailed system block diagrams, environment setup steps, and performance analysis.
+* **[Reflection_LearningPlan](./Reflection_LearningPlan):** Individual project reflections and strategic plans for scaling this solution in industry.
+* **[Code](./Code):** Source files for object detection and hardware acceleration scripts.
 
-### Sudo Bridge & Native OS Injection
-We bypassed library conflicts by injecting user paths into the root environment and installing the `setproctitle` library natively for telemetry:
-
-```bash
-# Bypass Python pip conflicts
-sudo -E python3 -m pip install setproctitle
+---
+*Deliverable for Step 1 - MENG3540 Parallel Programming*
